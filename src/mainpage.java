@@ -109,7 +109,6 @@ public class mainpage extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
         setBackground(new java.awt.Color(154, 48, 48));
-        setUndecorated(true);
 
         jPanel1.setBackground(new java.awt.Color(203, 176, 131));
 
