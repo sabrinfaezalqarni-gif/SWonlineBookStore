@@ -9,9 +9,10 @@
  */
 public class login extends javax.swing.JFrame {
 
-    /**
-     * Creates new form login
-     */
+   Connection conn = DatabaseConnection.connect();
+if (conn != null) {
+    // Write your SQL query here to check the username and password
+}
     public login() {
         initComponents();
     }
