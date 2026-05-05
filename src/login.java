@@ -12,7 +12,6 @@ import com.sun.jdi.connect.spi.Connection;
  */
 public class login extends javax.swing.JFrame {
 
-   Connection conn = (Connection) DatabaseConnection.connect();
    static {
     // Write your SQL query here to check the username and password
 }
