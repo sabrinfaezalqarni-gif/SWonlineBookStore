@@ -46,7 +46,6 @@ public class login extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(213, 190, 115));
-        setPreferredSize(new java.awt.Dimension(500, 550));
 
         jPanel1.setBackground(new java.awt.Color(245, 234, 216));
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(44, 24, 4), 10));
@@ -56,7 +55,7 @@ public class login extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(120, 90, 60));
-        jLabel2.setText("Username");
+        jLabel2.setText("Email Address");
 
         jButton1.setBackground(new java.awt.Color(101, 67, 30));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
