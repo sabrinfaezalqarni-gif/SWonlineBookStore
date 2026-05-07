@@ -149,8 +149,6 @@ public class mainpage extends javax.swing.JFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(44, 24, 4), 10));
         jPanel1.setPreferredSize(new java.awt.Dimension(500, 550));
 
-        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jTextField1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(188, 143, 95), 1, true));
         jTextField1.setPreferredSize(new java.awt.Dimension(6, 18));
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
@@ -182,7 +180,6 @@ public class mainpage extends javax.swing.JFrame {
 
         jLabel4.setText(" ");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(245, 234, 216));
         jLabel6.setText("My Orders");
         jLabel6.setToolTipText("");
@@ -191,12 +188,10 @@ public class mainpage extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(209, 182, 102));
         jLabel5.setText(" اِقْرَأْ");
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(245, 234, 216));
         jLabel7.setText("Cart");
         jLabel7.setToolTipText("");
 
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(245, 234, 216));
         jLabel8.setText("Profile");
         jLabel8.setToolTipText("");
