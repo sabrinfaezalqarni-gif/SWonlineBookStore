@@ -5,7 +5,7 @@ import com.sun.jdi.connect.spi.Connection;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
+//test puch
 /**
  *
  * @author sabreen
@@ -46,7 +46,6 @@ public class login extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(213, 190, 115));
-        setPreferredSize(new java.awt.Dimension(500, 550));
 
         jPanel1.setBackground(new java.awt.Color(245, 234, 216));
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(44, 24, 4), 10));
@@ -54,7 +53,6 @@ public class login extends javax.swing.JFrame {
         jPanel1.setEnabled(false);
         jPanel1.setPreferredSize(new java.awt.Dimension(500, 550));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(120, 90, 60));
         jLabel2.setText("Username");
 
@@ -69,7 +67,6 @@ public class login extends javax.swing.JFrame {
             }
         });
 
-        jPasswordField1.setBackground(new java.awt.Color(255, 255, 255));
         jPasswordField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
         jPasswordField1.setPreferredSize(new java.awt.Dimension(300, 28));
         jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
@@ -78,7 +75,6 @@ public class login extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(120, 90, 60));
         jLabel3.setText("Password");
 
@@ -88,8 +84,8 @@ public class login extends javax.swing.JFrame {
 
         jButton2.setBackground(new java.awt.Color(147, 109, 68));
         jButton2.setFont(new java.awt.Font("Dialog", 0, 12)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(139, 90, 43));
-        jButton2.setText("Don't have an account? Register here");
+        jButton2.setForeground(new java.awt.Color(246, 237, 229));
+        jButton2.setText("Sign Up");
         jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton2.setPreferredSize(new java.awt.Dimension(300, 28));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -155,12 +151,11 @@ public class login extends javax.swing.JFrame {
         panelAvatarLayout.setVerticalGroup(
             panelAvatarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelAvatarLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(11, Short.MAX_VALUE)
                 .addComponent(jLabel7)
                 .addContainerGap())
         );
 
-        jTextField2.setBackground(new java.awt.Color(255, 255, 255));
         jTextField2.setToolTipText("");
         jTextField2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
         jTextField2.setPreferredSize(new java.awt.Dimension(300, 28));
