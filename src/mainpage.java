@@ -7,8 +7,11 @@
  *
  * @author sabrin
  */
+// Define the cart list to be shared between pages
+
 public class mainpage extends javax.swing.JFrame {
-// Encapsulation: Using a list to manage cart items internally
+// Define the cart list to be shared between pages
+private java.util.ArrayList<Object[]> localCart = new java.util.ArrayList<>();
 private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<>();
     public mainpage() {
         initComponents();
@@ -332,58 +335,53 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-try {
-    // 1. Establish connection
-    java.sql.Connection conn = DatabaseConnection.connect();
-    
-    if (conn != null) {
-        // 2. SQL Query to search across multiple columns
-        // We use LIKE with % to find partial matches
-        String searchTxt = txtsearch.getText(); // The search box
-       String sql = "SELECT * FROM book WHERE " +
-             "BookID LIKE ? OR " +
-             "BookName LIKE ? OR " +
-             "Author LIKE ? ";
-             
+    try {
+        // 1. Establish database connection
+        java.sql.Connection conn = DatabaseConnection.connect();
         
-        java.sql.PreparedStatement pst = conn.prepareStatement(sql);
-        
-        // 3. Set the search term for all parameters
-        String query = "%" +searchTxt  + "%";
-        pst.setString(1, query);
-        pst.setString(2, query);
-        pst.setString(3, query);
-        
-        
-        java.sql.ResultSet rs = pst.executeQuery();
-        
-        // 4. Update the JTable (jTable1) with results
-        // Using DefaultTableModel to refresh the view
-        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTablemain.getModel();
-        model.setRowCount(0); // Clear current table data
-        
-       while (rs.next()) {
-    Object[] row = {
-        rs.getString("BookID"),          // يظهر تحت ID
-        rs.getString("BookName"),        // يظهر تحت Book Name
-        rs.getString("Author"),          // يظهر تحت Author
-        rs.getString("PublicationDate"), // يظهر تحت Date 
-        rs.getString("Price"),           // يظهر تحت Price
-        rs.getString("Stock")             // يظهر تحت Stock 
-                                   // يظهر تحت خانة Action الأخيرة
-    };
-    model.addRow(row);
-}
-        
-        if (model.getRowCount() == 0) {
-            javax.swing.JOptionPane.showMessageDialog(this, "No books found matching your search.");
+        if (conn != null) {
+            // 2. Get search input and prepare SQL with wildcards for partial matches
+            String searchTxt = txtsearch.getText(); 
+            String sql = "SELECT * FROM book WHERE BookID LIKE ? OR BookName LIKE ? OR Author LIKE ?";
+            
+            java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+            
+            // The "%" allows finding the text anywhere in the column
+            String queryTerm = "%" + searchTxt + "%"; 
+            pst.setString(1, queryTerm);
+            pst.setString(2, queryTerm);
+            pst.setString(3, queryTerm);
+            
+            java.sql.ResultSet rs = pst.executeQuery();
+            
+            // 3. Clear existing table rows before adding new search results
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTablemain.getModel();
+            model.setRowCount(0); 
+            
+            // 4. Loop through results and populate the table
+            while (rs.next()) {
+                Object[] row = {
+                    rs.getString("BookID"),
+                    rs.getString("BookName"),
+                    rs.getString("Author"),
+                    rs.getString("PublicationDate"),
+                    rs.getString("Price"),
+                    rs.getString("Stock")
+                };
+                model.addRow(row);
+            }
+            
+            // 5. Provide feedback if no results were found
+            if (model.getRowCount() == 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, "No books found matching your search.");
+            }
+            
+            conn.close(); // Important: Close connection to free resources
         }
-        
-        conn.close();
-    }
-} catch (Exception e) {
-    javax.swing.JOptionPane.showMessageDialog(this, "Search Error: " + e.getMessage());
-}        // TODO add your handling code here:
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Search Error: " + e.getMessage());
+    }   
+        // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void txtsearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtsearchActionPerformed
@@ -395,26 +393,47 @@ try {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-    // 1. Get the selected row index from the table
-    int selectedRow = jTablemain.getSelectedRow();
-    
-    if (selectedRow != -1) {
-        // 2. Extract data from the selected row
-        Object[] bookData = new Object[6];
-        for(int i = 0; i < 6; i++) {
-            bookData[i] = jTablemain.getValueAt(selectedRow, i);
+    // Get the search input from the text field
+    String searchInput = txtsearch.getText(); 
+
+
+    try {
+        // 2. Establish a connection to the database
+        java.sql.Connection con = DatabaseConnection.connect(); 
+        java.sql.Statement st = con.createStatement();
+        
+        // 3. SQL Query to check stock based on ID, Title, or Author
+        String query = "SELECT * FROM book WHERE " +
+                       "Bookid = '" + searchInput + "' OR " +
+                       "BookName = '" + searchInput + "' OR " +
+                       "Author = '" + searchInput + "'";
+        
+        java.sql.ResultSet rs = st.executeQuery(query);
+
+        if (rs.next()) {
+            int currentStock = rs.getInt("stock");
+
+            // 4. Inventory Validation: Check if the book is available
+            if (currentStock <= 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Sorry, this book is currently Out of Stock!", 
+                    "Inventory Alert", 
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+            } else {
+             
+               new shoppingCart(localCart).setVisible(true);
+                      this.dispose();
+            }
+        } else {
+            // Display message if no results found
+            javax.swing.JOptionPane.showMessageDialog(this, "Book not found. Please try again.");
         }
-        
-        // 3. Add to our temporary cart list
-        cartList.add(bookData);
-        
-        // 4. Feedback to the user
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            bookData[1] + " has been added to your cart.\nYou can search for more books or go to cart.");
-            
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Please select a book from the table first!");
+    } catch (Exception e) {
+        // Log database errors for debugging
+        System.out.println("Database Error: " + e.getMessage());
     }
+
+
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton6ActionPerformed
 

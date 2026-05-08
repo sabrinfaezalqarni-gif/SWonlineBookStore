@@ -21,8 +21,7 @@ public class DatabaseConnection {
         try {
             String url = "jdbc:mysql://localhost:3306/onlinebookstore";
             String user = "root"; 
-            String password = ""; // الباسورد الافتراضي في XAMPP يكون فارغاً
-            
+            String password = ""; 
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(url, user, password);
             
