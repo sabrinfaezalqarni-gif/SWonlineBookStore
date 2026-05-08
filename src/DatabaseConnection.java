@@ -20,7 +20,7 @@ public class DatabaseConnection {
         Connection conn = null;
         try {
             String url = "jdbc:mysql://localhost:3306/onlinebookstore";
-            String user = "root"; // المستخدم الافتراضي
+            String user = "root"; 
             String password = ""; // الباسورد الافتراضي في XAMPP يكون فارغاً
             
             Class.forName("com.mysql.cj.jdbc.Driver");
