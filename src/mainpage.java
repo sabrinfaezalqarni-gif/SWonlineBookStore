@@ -8,10 +8,8 @@
  * @author sabrin
  */
 public class mainpage extends javax.swing.JFrame {
-
-    /**
-     * Creates new form mainpage
-     */
+// Encapsulation: Using a list to manage cart items internally
+private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<>();
     public mainpage() {
         initComponents();
     }
@@ -397,6 +395,26 @@ try {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    // 1. Get the selected row index from the table
+    int selectedRow = jTablemain.getSelectedRow();
+    
+    if (selectedRow != -1) {
+        // 2. Extract data from the selected row
+        Object[] bookData = new Object[6];
+        for(int i = 0; i < 6; i++) {
+            bookData[i] = jTablemain.getValueAt(selectedRow, i);
+        }
+        
+        // 3. Add to our temporary cart list
+        cartList.add(bookData);
+        
+        // 4. Feedback to the user
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            bookData[1] + " has been added to your cart.\nYou can search for more books or go to cart.");
+            
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please select a book from the table first!");
+    }
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton6ActionPerformed
 
@@ -405,7 +423,15 @@ try {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+    if (cartList.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Your cart is empty!");
+    } else {
+        // نستخدم الاسم الصحيح للملف الآن
+        shoppingCart cartUI = new shoppingCart(cartList); 
+        cartUI.setVisible(true);
+        this.dispose();
+    }
+  // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed

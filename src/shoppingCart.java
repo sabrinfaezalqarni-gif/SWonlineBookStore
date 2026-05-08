@@ -9,12 +9,30 @@
  */
 public class shoppingCart extends javax.swing.JFrame {
 
-    /**
-     * Creates new form shoppingCart
-     */
+    // 1. القائمة التي ستحفظ الكتب الممرة
+    private java.util.ArrayList<Object[]> localCart;
+
+    // 2. تحديث الكونستركتور ليتطابق مع اسم الكلاس shoppingCart
+    public shoppingCart(java.util.ArrayList<Object[]> passedCart) {
+        initComponents();
+        this.localCart = passedCart;
+        displayCartItems(); // دالة لعرض الكتب في الجدول سنعرفها بالأسفل
+    }
+
+    // كونستركتور فارغ للـ Design view
     public shoppingCart() {
         initComponents();
     }
+    
+    // دالة عرض البيانات في الجدول (jTable)
+    private void displayCartItems() {
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0); 
+        for (Object[] row : localCart) {
+            model.addRow(row);
+        }
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
