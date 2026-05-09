@@ -26,7 +26,7 @@ public class DatabaseConnection {
             conn = DriverManager.getConnection(url, user, password);
             
         } catch (ClassNotFoundException | SQLException e) {
-            JOptionPane.showMessageDialog(null, "خطأ في الاتصال بقاعدة البيانات: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         }
         return conn;
     }

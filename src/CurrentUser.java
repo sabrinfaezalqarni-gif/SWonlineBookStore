@@ -7,7 +7,7 @@
  * @author sabreen
  */
 public class CurrentUser {
-    public static int id; // يجب أن يكون static
+    public static int id; 
     public static String name;
 }
 
