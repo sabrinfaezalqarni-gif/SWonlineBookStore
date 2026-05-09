@@ -393,45 +393,45 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-    // Get the search input from the text field
-    String searchInput = txtsearch.getText(); 
-
-
-    try {
-        // 2. Establish a connection to the database
-        java.sql.Connection con = DatabaseConnection.connect(); 
-        java.sql.Statement st = con.createStatement();
-        
-        // 3. SQL Query to check stock based on ID, Title, or Author
-        String query = "SELECT * FROM book WHERE " +
-                       "Bookid = '" + searchInput + "' OR " +
-                       "BookName = '" + searchInput + "' OR " +
-                       "Author = '" + searchInput + "'";
-        
-        java.sql.ResultSet rs = st.executeQuery(query);
-
-        if (rs.next()) {
-            int currentStock = rs.getInt("stock");
-
-            // 4. Inventory Validation: Check if the book is available
-            if (currentStock <= 0) {
-                javax.swing.JOptionPane.showMessageDialog(this, 
-                    "Sorry, this book is currently Out of Stock!", 
-                    "Inventory Alert", 
-                    javax.swing.JOptionPane.WARNING_MESSAGE);
-            } else {
-             
-               new shoppingCart(localCart).setVisible(true);
-                      this.dispose();
-            }
-        } else {
-            // Display message if no results found
-            javax.swing.JOptionPane.showMessageDialog(this, "Book not found. Please try again.");
-        }
-    } catch (Exception e) {
-        // Log database errors for debugging
-        System.out.println("Database Error: " + e.getMessage());
+    int selectedRow = jTablemain.getSelectedRow();
+    
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please select a book from the table first!");
+        return;
     }
+    
+    try {
+        // Get book data from selected row
+        String bookId = jTablemain.getValueAt(selectedRow, 0).toString();
+        String bookName = jTablemain.getValueAt(selectedRow, 1).toString();
+        String author = jTablemain.getValueAt(selectedRow, 2).toString();
+        String date = jTablemain.getValueAt(selectedRow, 3).toString();
+        double price = Double.parseDouble(jTablemain.getValueAt(selectedRow, 4).toString());
+        int stock = Integer.parseInt(jTablemain.getValueAt(selectedRow, 5).toString());
+        
+        // Check stock availability
+        if (stock <= 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Sorry, this book is currently Out of Stock!", 
+                "Inventory Alert", 
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Create cart item with default quantity 1
+        Object[] cartItem = {bookId, bookName, author, date, price, 1, price * 1}; // ID, Name, Author, Date, Price, Qty, Total
+        
+        // Add to BOTH local and static cart (for persistence)
+        localCart.add(cartItem);
+        cartList.add(cartItem);
+        
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            bookName + " added to cart successfully!");
+            
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Error adding to cart: " + e.getMessage());
+    }
+
 
 
         // TODO add your handling code here:
@@ -442,14 +442,15 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-    if (cartList.isEmpty()) {
+    if (localCart.isEmpty() && cartList.isEmpty()) {
         javax.swing.JOptionPane.showMessageDialog(this, "Your cart is empty!");
     } else {
-        // نستخدم الاسم الصحيح للملف الآن
+        // Use the static cartList to ensure data persistence
         shoppingCart cartUI = new shoppingCart(cartList); 
         cartUI.setVisible(true);
         this.dispose();
     }
+
   // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
 

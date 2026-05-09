@@ -2,19 +2,82 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author ASUS
- */
+
 public class adminDashboard extends javax.swing.JFrame {
+    DefaultTableModel bookModel;
+    DefaultTableModel orderModel;
+    
+   public adminDashboard() {
+    initComponents();
+    // استدعاء الدوال هنا ضروري لكي تظهر البيانات فور فتح الصفحة
+    loadBooksData();   
+    loadOrdersData();  
+    
+    // إضافة "مستمع" للجدول: عندما يضغط الآدمن على سطر، تمتلئ الحقول تلقائياً للتعديل
+    jTableBooks.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            int row = jTableBooks.getSelectedRow();
+            txttitle.setText(jTableBooks.getValueAt(row, 1).toString());
+            txtauthor.setText(jTableBooks.getValueAt(row, 2).toString());
+            txtprice.setText(jTableBooks.getValueAt(row, 5).toString()); // السعر في العمود الأخير
+            txtstock.setText(jTableBooks.getValueAt(row, 4).toString()); // المخزون في العمود قبل الأخير
+        }
+    });
+}
+  private void loadBooksData() {
+    try {
+        java.sql.Connection conn = DatabaseConnection.connect();
+        String sql = "SELECT * FROM book";
+        java.sql.ResultSet rs = conn.prepareStatement(sql).executeQuery();
+        
+        bookModel = (DefaultTableModel) jTableBooks.getModel();
+        bookModel.setRowCount(0); 
 
-    /**
-     * Creates new form adminDashboard
-     */
-    public adminDashboard() {
-        initComponents();
+        while (rs.next()) {
+            bookModel.addRow(new Object[]{
+                rs.getString("BookID"),
+                rs.getString("BookName"),
+                rs.getString("Author"),
+                rs.getString("Price"),
+                rs.getString("Stock")
+            });
+        }
+        conn.close();
+    } catch (Exception e) {
+        System.out.println("Error loading books: " + e.getMessage());
     }
+}
+    
+
+  private void loadOrdersData() {
+    try {
+        java.sql.Connection conn = DatabaseConnection.connect();
+        // لاحظي استخدام اسم الجدول الجديد 'orders' بدلاً من 'user'
+        String sql = "SELECT order_id, total_price, status, order_date FROM orders";
+        java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+        java.sql.ResultSet rs = pst.executeQuery();
+        
+        // تأكدي أن اسم الجدول في الواجهة هو jTableOrders
+        orderModel = (DefaultTableModel) jTableOrders.getModel();
+        orderModel.setRowCount(0);
+        
+        while (rs.next()) {
+            orderModel.addRow(new Object[]{
+                rs.getInt("order_id"),      // أصبح رقم (int)
+                rs.getDouble("total_price"), // أصبح رقم (double)
+                rs.getString("status"),
+                rs.getTimestamp("order_date")
+            });
+        }
+        conn.close();
+    } catch (Exception e) {
+        // نصيحة هندسية: استخدمي JOptionPane لإظهار الخطأ بوضوح أثناء البرمجة
+        javax.swing.JOptionPane.showMessageDialog(this, "Error loading orders: " + e.getMessage());
+    }
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -32,24 +95,24 @@ public class adminDashboard extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTableBooks = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txttitle = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        txtauthor = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        txtprice = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
+        txtstock = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        jScrollPaneOrders = new javax.swing.JScrollPane();
+        jTableOrders = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -105,24 +168,32 @@ public class adminDashboard extends javax.swing.JFrame {
         jScrollPane1.setBackground(new java.awt.Color(236, 221, 197));
         jScrollPane1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableBooks.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "ID", "Title", "Author", "Publication Date", "Stock", "Price"
+                "ID", "Title", "Author", "Price", "Stock"
             }
-        ));
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
-            jTable1.getColumnModel().getColumn(1).setPreferredWidth(250);
-            jTable1.getColumnModel().getColumn(2).setPreferredWidth(200);
-            jTable1.getColumnModel().getColumn(4).setPreferredWidth(100);
-            jTable1.getColumnModel().getColumn(5).setPreferredWidth(150);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(jTableBooks);
+        if (jTableBooks.getColumnModel().getColumnCount() > 0) {
+            jTableBooks.getColumnModel().getColumn(0).setPreferredWidth(50);
+            jTableBooks.getColumnModel().getColumn(1).setPreferredWidth(250);
+            jTableBooks.getColumnModel().getColumn(2).setPreferredWidth(200);
+            jTableBooks.getColumnModel().getColumn(3).setPreferredWidth(150);
+            jTableBooks.getColumnModel().getColumn(4).setPreferredWidth(100);
         }
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
@@ -136,8 +207,8 @@ public class adminDashboard extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(44, 24, 4));
         jLabel2.setText("Add / Edit Book");
 
-        jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
+        txttitle.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        txttitle.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(120, 90, 60));
@@ -148,10 +219,10 @@ public class adminDashboard extends javax.swing.JFrame {
         jLabel8.setText("Author");
         jLabel8.setToolTipText("");
 
-        jTextField2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        txtauthor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
+        txtauthor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                txtauthorActionPerformed(evt);
             }
         });
 
@@ -159,28 +230,43 @@ public class adminDashboard extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(120, 90, 60));
         jLabel9.setText("Price (SAR) ");
 
-        jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
+        txtprice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(120, 90, 60));
         jLabel10.setText("Stock ");
 
-        jTextField4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
+        txtstock.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
 
         jButton1.setBackground(new java.awt.Color(101, 67, 30));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         jButton1.setForeground(new java.awt.Color(245, 234, 216));
         jButton1.setText("Add Book");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setBackground(new java.awt.Color(139, 90, 43));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         jButton2.setForeground(new java.awt.Color(245, 234, 216));
         jButton2.setText("Update");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setBackground(new java.awt.Color(165, 42, 42));
         jButton3.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         jButton3.setForeground(new java.awt.Color(255, 255, 255));
         jButton3.setText("Delete");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -194,15 +280,15 @@ public class adminDashboard extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(50, 50, 50)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txttitle, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3)
                             .addComponent(jLabel9)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtprice, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtstock, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel8)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtauthor, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel10))))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -223,8 +309,8 @@ public class adminDashboard extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(54, 54, 54)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txttitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtauthor, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton1)
                             .addComponent(jButton2)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -240,8 +326,8 @@ public class adminDashboard extends javax.swing.JFrame {
                         .addComponent(jLabel10)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtstock, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtprice, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jButton3)
                     .addComponent(jLabel9))
                 .addGap(0, 18, Short.MAX_VALUE))
@@ -251,7 +337,7 @@ public class adminDashboard extends javax.swing.JFrame {
         jLabel11.setForeground(new java.awt.Color(44, 24, 4));
         jLabel11.setText("Customer Orders");
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        jTableOrders.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -259,15 +345,23 @@ public class adminDashboard extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Order #", "Customer", "Total", "Status"
+                "User ID", "Total", "Status", "Date & Time"
             }
-        ));
-        jScrollPane2.setViewportView(jTable2);
-        if (jTable2.getColumnModel().getColumnCount() > 0) {
-            jTable2.getColumnModel().getColumn(0).setPreferredWidth(100);
-            jTable2.getColumnModel().getColumn(1).setPreferredWidth(300);
-            jTable2.getColumnModel().getColumn(2).setPreferredWidth(150);
-            jTable2.getColumnModel().getColumn(3).setPreferredWidth(200);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPaneOrders.setViewportView(jTableOrders);
+        if (jTableOrders.getColumnModel().getColumnCount() > 0) {
+            jTableOrders.getColumnModel().getColumn(0).setPreferredWidth(100);
+            jTableOrders.getColumnModel().getColumn(1).setPreferredWidth(300);
+            jTableOrders.getColumnModel().getColumn(2).setPreferredWidth(200);
+            jTableOrders.getColumnModel().getColumn(3).setPreferredWidth(150);
         }
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -287,7 +381,7 @@ public class adminDashboard extends javax.swing.JFrame {
                                 .addGap(6, 6, 6)
                                 .addComponent(jLabel11)))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPaneOrders))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -296,14 +390,14 @@ public class adminDashboard extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(4, 4, 4)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPaneOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 19, Short.MAX_VALUE))
         );
 
@@ -321,9 +415,98 @@ public class adminDashboard extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void txtauthorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtauthorActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_txtauthorActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    int selectedRow = jTableBooks.getSelectedRow();
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Select a book from the table first!");
+        return;
+    }
+
+    String id = jTableBooks.getValueAt(selectedRow, 0).toString();
+
+    try {
+        java.sql.Connection conn = DatabaseConnection.connect();
+        String sql = "UPDATE book SET BookName=?, Author=?, Price=?, Stock=? WHERE BookID=?";
+        java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+        
+        pst.setString(1, txttitle.getText());
+        pst.setString(2, txtauthor.getText());
+        pst.setDouble(3, Double.parseDouble(txtprice.getText()));
+        pst.setInt(4, Integer.parseInt(txtstock.getText()));
+        pst.setString(5, id);
+        
+        pst.executeUpdate();
+        javax.swing.JOptionPane.showMessageDialog(this, "Book Updated Successfully!");
+        
+        loadBooksData(); // تحديث الجدول
+        conn.close();
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    try {
+        java.sql.Connection conn = DatabaseConnection.connect();
+        // التعديل هنا: إضافة تعريف PreparedStatement
+        String sql = "INSERT INTO book (BookName, Author, Price, Stock) VALUES (?, ?, ?, ?)";
+        java.sql.PreparedStatement pst = conn.prepareStatement(sql); 
+        
+        pst.setString(1, txttitle.getText());
+        pst.setString(2, txtauthor.getText());
+        pst.setDouble(3, Double.parseDouble(txtprice.getText()));
+        pst.setInt(4, Integer.parseInt(txtstock.getText()));
+        
+        pst.executeUpdate();
+        javax.swing.JOptionPane.showMessageDialog(this, "Book Added Successfully!");
+        
+        // تنظيف الحقول وتحديث الجدول
+        txttitle.setText(""); txtauthor.setText(""); txtprice.setText(""); txtstock.setText("");
+        loadBooksData(); 
+        conn.close();
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    int selectedRow = jTableBooks.getSelectedRow();
+    
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Please select a book to delete!");
+        return;
+    }
+
+    // الحصول على ID الكتاب من السطر المختار (العمود رقم 0)
+    String bookID = jTableBooks.getValueAt(selectedRow, 0).toString();
+    
+    int confirm = javax.swing.JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this book?", "Confirm Delete", javax.swing.JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        try {
+            java.sql.Connection conn = DatabaseConnection.connect();
+            String sql = "DELETE FROM book WHERE BookID = ?";
+            java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+            pst.setString(1, bookID);
+            
+            pst.executeUpdate();
+            javax.swing.JOptionPane.showMessageDialog(this, "Book Deleted Successfully!");
+            
+            loadBooksData(); // إعادة تحميل الجدول بعد الحذف
+            conn.close();
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -379,12 +562,12 @@ public class adminDashboard extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+    private javax.swing.JScrollPane jScrollPaneOrders;
+    private javax.swing.JTable jTableBooks;
+    private javax.swing.JTable jTableOrders;
+    private javax.swing.JTextField txtauthor;
+    private javax.swing.JTextField txtprice;
+    private javax.swing.JTextField txtstock;
+    private javax.swing.JTextField txttitle;
     // End of variables declaration//GEN-END:variables
 }

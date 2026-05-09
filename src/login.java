@@ -1,6 +1,6 @@
 
 import com.sun.jdi.connect.spi.Connection;
-
+import javax.swing.JOptionPane;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -11,6 +11,7 @@ import com.sun.jdi.connect.spi.Connection;
  * @author sabreen
  */
 public class login extends javax.swing.JFrame {
+
 
    static {
     // Write your SQL query here to check the username and password
@@ -244,45 +245,48 @@ this.dispose();        // TODO add your handling code here:
     }//GEN-LAST:event_txtpasswordActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
- try {
-    // 1. Establish connection to the database
-    java.sql.Connection conn = DatabaseConnection.connect();
-    
-    if (conn != null) {
-        // 2. SQL query to check if the user exists
-        String sql = "SELECT * FROM user WHERE username = ? AND password = ?";
-        java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+    String user = txtusername.getText();
+    String pass = new String(txtpassword.getPassword());
+
+    try {
+        java.sql.Connection conn = DatabaseConnection.connect();
         
-        // 3. Get input values from TextFields
-        pst.setString(1, txtusername.getText()); 
-        pst.setString(2, new String(txtpassword.getPassword())); 
-        
-        java.sql.ResultSet rs = pst.executeQuery();
-        
-        if (rs.next()) {
-            // 4. Case: Success - Credentials match
-            javax.swing.JOptionPane.showMessageDialog(this, "Login Successful!");
-            
-            // Open Main Page and close Login frame
-            mainpage home = new mainpage();
-            home.setVisible(true);
-            this.dispose(); 
-            
+        // 1. فحص هل المستخدم موجود في جدول الـ Admins؟
+        String adminSql = "SELECT * FROM admins WHERE username = ? AND password = ?";
+        java.sql.PreparedStatement adminPst = conn.prepareStatement(adminSql);
+        adminPst.setString(1, user);
+        adminPst.setString(2, pass);
+        java.sql.ResultSet adminRs = adminPst.executeQuery();
+
+        if (adminRs.next()) {
+            // إذا وجده في جدول الآدمن
+            JOptionPane.showMessageDialog(this, "Welcome Admin: " + adminRs.getString("full_name"));
+            new adminDashboard().setVisible(true); // فتح لوحة تحكم الآدمن
+            this.dispose();
         } else {
-            // 5. Case: Failure - Wrong username or password
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                "Invalid Username or Password. Please try again or register as a new user.", 
-                "Login Failed", 
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-            
-            // The user stays on the Login page to either retry or click the Sign Up button
+            String userSql = "SELECT * FROM user WHERE username = ? AND password = ?";
+            java.sql.PreparedStatement userPst = conn.prepareStatement(userSql);
+            userPst.setString(1, user);
+            userPst.setString(2, pass);
+            java.sql.ResultSet userRs = userPst.executeQuery();
+
+      if (userRs.next()) {
+    // جلب الرقم من عمود id وتخزينه في الكلاس المشترك
+    CurrentUser.id = userRs.getInt("id"); 
+    CurrentUser.name = userRs.getString("FullName");
+
+    JOptionPane.showMessageDialog(this, "Welcome " + CurrentUser.name + " ID: " + CurrentUser.id);
+    new mainpage().setVisible(true);
+    this.dispose();
+}else {
+                JOptionPane.showMessageDialog(this, "Invalid Username or Password");
+            }
         }
         conn.close();
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
     }
-} catch (Exception e) {
-    // Handle potential connection errors
-    javax.swing.JOptionPane.showMessageDialog(this, "Database Error: " + e.getMessage());
-}
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

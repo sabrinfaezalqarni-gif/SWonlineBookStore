@@ -7,15 +7,25 @@
  *
  * @author ASUS
  */
+import javax.swing.JOptionPane;
 public class checkout extends javax.swing.JFrame {
-
-    /**
-     * Creates new form checkout
-     */
-    public checkout() {
-        initComponents();
+ private java.util.ArrayList<Object[]> localCart;
+ 
+public checkout(java.util.ArrayList<Object[]> passedCart) {
+    initComponents();
+    this.localCart = passedCart;
+    
+    // Calculate total amount immediately
+    double total = 0;
+    if (localCart != null) {
+        for (Object[] item : localCart) {
+            // Index 6 is the "Total" column from the shopping cart table
+            total += Double.parseDouble(item[6].toString());
+        }
     }
-
+    // Display the sum in the label
+    lblTotal.setText("Total: SAR " + total);
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,13 +46,13 @@ public class checkout extends javax.swing.JFrame {
         jButton6 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jLabel10 = new javax.swing.JLabel();
+        radioCash = new javax.swing.JRadioButton();
+        radioCard = new javax.swing.JRadioButton();
+        lblTotal = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        txtInvoice = new javax.swing.JTextArea();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -135,43 +145,59 @@ public class checkout extends javax.swing.JFrame {
         jLabel9.setForeground(new java.awt.Color(44, 24, 4));
         jLabel9.setText("Payment Method");
 
-        jRadioButton1.setBackground(new java.awt.Color(245, 234, 216));
-        jRadioButton1.setForeground(new java.awt.Color(44, 24, 4));
-        jRadioButton1.setText("Cash on Delivery");
+        radioCash.setBackground(new java.awt.Color(245, 234, 216));
+        radioCash.setForeground(new java.awt.Color(44, 24, 4));
+        radioCash.setText("Cash on Delivery");
 
-        jRadioButton2.setBackground(new java.awt.Color(245, 234, 216));
-        jRadioButton2.setForeground(new java.awt.Color(44, 24, 4));
-        jRadioButton2.setText("Credit Card");
+        radioCard.setBackground(new java.awt.Color(245, 234, 216));
+        radioCard.setForeground(new java.awt.Color(44, 24, 4));
+        radioCard.setText("Credit Card");
+        radioCard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioCardActionPerformed(evt);
+            }
+        });
 
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(101, 67, 30));
-        jLabel10.setText("Total: SAR 0");
+        lblTotal.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblTotal.setForeground(new java.awt.Color(101, 67, 30));
+        lblTotal.setText("Total: SAR 0");
 
         jButton1.setBackground(new java.awt.Color(101, 67, 30));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton1.setForeground(new java.awt.Color(245, 234, 216));
         jButton1.setText("Place Order");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel11.setForeground(new java.awt.Color(120, 90, 60));
         jLabel11.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane3.setViewportView(jTextArea1);
+        txtInvoice.setColumns(20);
+        txtInvoice.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
+        txtInvoice.setRows(5);
+        txtInvoice.setEnabled(false);
+        jScrollPane3.setViewportView(txtInvoice);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10)
-                    .addComponent(jLabel9)
-                    .addComponent(jRadioButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jRadioButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTotal)
+                            .addComponent(jLabel9)
+                            .addComponent(radioCard, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(radioCash, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(20, 20, 20)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel11))
@@ -187,16 +213,20 @@ public class checkout extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addGap(18, 18, 18)
-                        .addComponent(jRadioButton1)
+                        .addComponent(radioCash)
                         .addGap(18, 18, 18)
-                        .addComponent(jRadioButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel10)
-                        .addGap(18, 18, 18)
+                        .addComponent(radioCard)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel11)
+                                .addGap(53, 53, 53))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(lblTotal)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15)
-                        .addComponent(jLabel11)
-                        .addGap(359, 359, 359))))
+                        .addGap(283, 283, 283))))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -240,6 +270,56 @@ public class checkout extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jButton6ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    if (localCart == null || localCart.isEmpty()) return;
+
+    try {
+        java.sql.Connection conn = DatabaseConnection.connect();
+        
+        // 1. حساب الإجمالي
+        double total = 0;
+        for (Object[] item : localCart) {
+            total += Double.parseDouble(item[6].toString());
+        }
+
+        // 2. حفظ الطلب في جدول orders لكي يراه الآدمن
+        // ملاحظة: العمود اسمه 'id' في جدولك للربط بالمستخدم، و 'total_price' للمبلغ
+        String sqlOrder = "INSERT INTO orders (id, total_price, status) VALUES (?, ?, 'Pending')";
+        java.sql.PreparedStatement pstOrder = conn.prepareStatement(sqlOrder);
+        pstOrder.setInt(1, CurrentUser.id);
+        pstOrder.setDouble(2, total);
+        System.out.println("DEBUG: Sending User ID = " + CurrentUser.id);
+if (CurrentUser.id <= 0) {
+    JOptionPane.showMessageDialog(this, "Error: User ID is 0. Please login again!");
+    return;
+}
+        pstOrder.executeUpdate();
+
+        // 3. عرض الفاتورة للمستخدم
+        StringBuilder bill = new StringBuilder();
+        bill.append("---------- IQRA BOOKSTORE ----------\n");
+        bill.append("Customer: " + CurrentUser.name + "\n");
+        bill.append("Payment: " + (radioCard.isSelected() ? "Card" : "Cash") + "\n\n");
+        for (Object[] row : localCart) {
+            bill.append(row[1] + " x" + row[5] + " = " + row[6] + " SAR\n");
+        }
+        bill.append("\nTOTAL: " + total + " SAR\n");
+        txtInvoice.setText(bill.toString());
+
+        JOptionPane.showMessageDialog(this, "Order Placed Successfully! Admin will process it.");
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+
+
+  // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void radioCardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioCardActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_radioCardActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -268,17 +348,18 @@ public class checkout extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new checkout().setVisible(true);
-            }
+       java.awt.EventQueue.invokeLater(new Runnable() {
+    public void run() {
+        // نرسل قائمة فارغة لكي يفتح البرنامج بدون أخطاء
+        new checkout(new java.util.ArrayList<Object[]>()).setVisible(true);
+    }
+
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton6;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -287,12 +368,13 @@ public class checkout extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JLabel lblTotal;
+    private javax.swing.JRadioButton radioCard;
+    private javax.swing.JRadioButton radioCash;
+    private javax.swing.JTextArea txtInvoice;
     // End of variables declaration//GEN-END:variables
 }

@@ -11,71 +11,112 @@ import java.util.ArrayList;
 public class shoppingCart extends javax.swing.JFrame {
 
     private java.util.ArrayList<Object[]> localCart;
+ // أضيفي هذا السطر في أعلى الكلاس تحت سطر اسم الكلاس مباشرة
+DefaultTableModel orderModel;
 
- public shoppingCart(java.util.ArrayList<Object[]> passedCart) {
-    initComponents();
+private void calculateGrandTotal() {
+    double sum = 0;
+    // Iterate through all rows in the table
+    for (int i = 0; i < jTableCart.getRowCount(); i++) {
+        // Get value from column 6 (The "Total" column)
+        Object value = jTableCart.getValueAt(i, 6);
+        if (value != null) {
+            sum += Double.parseDouble(value.toString());
+        }
+    }
+    // Update your label with the calculated sum
+    // Assuming your label name is lblGrandTotal
+    lblGrandTotal.setText("Total : " + sum + " SAR");
+} 
+public shoppingCart(java.util.ArrayList<Object[]> passedCart) {
+    initComponents(); // هذا يستدعي التصميم الأصلي
+    
+    // نضع الكود هنا لإعادة تعريف موديل الجدول بالأعمدة الجديدة
+    jTableCart.setModel(new javax.swing.table.DefaultTableModel(
+        new Object [][] {},
+        new String [] {
+            "ID", "Book Name", "Author", "Date", "Price", "Quantity", "Total"
+        }
+    ) {
+        boolean[] canEdit = new boolean [] {
+            false, false, false, false, false, true, false 
+        };
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return canEdit [columnIndex];
+        }
+    });
+
     this.localCart = passedCart;
     displayCartItems(); 
+    calculateGrandTotal();
+}
 
-    // انقل الكود إلى هنا ليعمل بشكل صحيح
-    jTableCart.getModel().addTableModelListener(e -> {
-    if (e.getType() == javax.swing.event.TableModelEvent.UPDATE && e.getColumn() == 4) {
-        int row = e.getFirstRow();
-        updateRowTotal(row); // استدعاء دالة تحديث السعر والمجموع
+ private void addToCartDatabase(int bookId, int quantity) {
+    try {
+        java.sql.Connection conn = DatabaseConnection.connect();
+        // الحفظ في جدول cart الجديد الذي أنشأناه
+        String sql = "INSERT INTO cart (user_id, book_id, quantity) VALUES (?, ?, ?)";
+        java.sql.PreparedStatement pst = conn.prepareStatement(sql);
+        pst.setInt(1, CurrentUser.id); // الـ id الذي أضفناه لجدول user
+        pst.setInt(2, bookId);
+        pst.setInt(3, quantity);
+        pst.executeUpdate();
+        conn.close();
+    } catch (Exception e) {
+        e.printStackTrace();
     }
-});
-}
-  
+} 
+  // Method to display items from the ArrayList into the JTable
+
     private void displayCartItems() {
-    DefaultTableModel model = (DefaultTableModel) jTableCart.getModel();
-    model.setRowCount(0); 
-    for (Object[] row : localCart) {
-        // إذا لم تكن هناك كمية محددة، اجعليها 1 افتراضياً
-        if (row[4] == null || row[4].toString().isEmpty()) {
-            row[4] = 1; 
+
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTableCart.getModel();
+
+        model.setRowCount(0); 
+
+        for (Object[] row : localCart) {
+
+            model.addRow(row);
+
         }
-        model.addRow(row);
+
     }
-    calculateTotal(); // حساب المجموع فور العرض
-}
 private void updateRowTotal(int row) {
     try {
-        // جلب السعر من عمود 3 والكمية من عمود 4
-        double price = Double.parseDouble(jTableCart.getValueAt(row, 3).toString());
-        int qty = Integer.parseInt(jTableCart.getValueAt(row, 4).toString());
+        // CORRECT: Price col 4, Quantity col 5, Total col 6 (index 5)
+        double price = Double.parseDouble(jTableCart.getValueAt(row, 4).toString());
+        int qty = Integer.parseInt(jTableCart.getValueAt(row, 5).toString());
         
-        // منع المستخدم من وضع رقم أقل من 1
         if (qty < 1) {
             qty = 1;
-            jTableCart.setValueAt(1, row, 4);
+            jTableCart.setValueAt(1, row, 5);
         }
 
         double rowTotal = price * qty;
-        jTableCart.setValueAt(rowTotal, row, 5); // وضع المجموع في عمود 5
-        
+        jTableCart.setValueAt(rowTotal, row, 6); // Total column (index 6)
         calculateTotal(); 
     } catch (NumberFormatException e) {
-        // إذا أدخل المستخدم حروفاً بالخطأ، أرجعي الكمية لـ 1
-        jTableCart.setValueAt(1, row, 4);
+        jTableCart.setValueAt(1, row, 5);
+        calculateTotal();
     }
 }
+// [Goal 3] Calculate Grand Total Price
 private void calculateTotal() {
     double grandTotal = 0;
     for (int i = 0; i < jTableCart.getRowCount(); i++) {
         try {
-            Object value = jTableCart.getValueAt(i, 4);
-            if (value != null) {
-                grandTotal += Double.parseDouble(value.toString());
-            }
-        } catch (Exception e) {
-            // تجاهل أي قيم غير رقمية لضمان استقرار التطبيق
+            // CORRECT INDICES: Price at col 4 (index 4), Qty at col 5 (index 5)
+            double price = Double.parseDouble(jTableCart.getValueAt(i, 4).toString());
+            int qty = Integer.parseInt(jTableCart.getValueAt(i, 5).toString());
+            grandTotal += (price * qty);
+        } catch (NumberFormatException e) {
+            // Skip rows with invalid data
+            continue;
         }
     }
-    // تأكدي أن لديكِ Label باسم lblGrandTotal في التصميم، أو غيري الاسم هنا لما هو موجود عندك
-    // إذا لم يكن موجوداً، يمكنك إظهاره في رسالة أو تعريفه في initComponents
-    if (lblGrandTotal != null) {
-        lblGrandTotal.setText("Total: SAR " + grandTotal);
-    }
+    lblGrandTotal.setText("Total: SAR " + String.format("%.2f", grandTotal));
 }
 
 
@@ -168,7 +209,7 @@ private void calculateTotal() {
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true, false, false, true
+                false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -240,7 +281,7 @@ private void calculateTotal() {
                     .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblGrandTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15))
+                .addGap(37, 37, 37))
         );
         jpanalLayout.setVerticalGroup(
             jpanalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -248,18 +289,15 @@ private void calculateTotal() {
                 .addContainerGap(15, Short.MAX_VALUE)
                 .addGroup(jpanalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpanalLayout.createSequentialGroup()
-                        .addGroup(jpanalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpanalLayout.createSequentialGroup()
-                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpanalLayout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(3, 3, 3)))
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpanalLayout.createSequentialGroup()
-                        .addComponent(lblGrandTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15))))
+                        .addGroup(jpanalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(lblGrandTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(3, 3, 3)))
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -271,15 +309,15 @@ private void calculateTotal() {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton2)
-                        .addGap(21, 21, 21))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jpanal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
                         .addContainerGap())))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton2)
+                .addGap(26, 26, 26))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -289,9 +327,9 @@ private void calculateTotal() {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jpanal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jButton2)
-                .addContainerGap())
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -337,25 +375,13 @@ private void calculateTotal() {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-    try {
-        java.sql.Connection conn = DatabaseConnection.connect(); // تأكدي من اسم كلاس الاتصال عندك
-        java.sql.Statement st = conn.createStatement();
-
-        for (int i = 0; i < jTableCart.getRowCount(); i++) {
-            String bookID = jTableCart.getValueAt(i, 0).toString(); // عمود الـ ID
-            int qtyBought = Integer.parseInt(jTableCart.getValueAt(i, 5).toString()); // عمود الكمية
-
-            // أمر SQL لنقص الكمية من جدول الكتب (تأكدي من اسم الجدول والعمود)
-            String query = "UPDATE books SET stock = stock - " + qtyBought + " WHERE id = '" + bookID + "'";
-            st.executeUpdate(query);
-        }
-        
-        JOptionPane.showMessageDialog(this, "Purchase successful! Database updated.");
-        localCart.clear();
-        displayCartItems();
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error updating database: " + e.getMessage());
+    if (localCart.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Your cart is empty!");
+        return;
     }
+    // الانتقال لصفحة الدفع وتمرير محتويات السلة لها
+    new checkout(localCart).setVisible(true);
+    this.dispose();
 
 
         // TODO add your handling code here:
