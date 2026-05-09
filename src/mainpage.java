@@ -336,7 +336,6 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
     try {
-        // 1. Establish database connection
         java.sql.Connection conn = DatabaseConnection.connect();
         
         if (conn != null) {
@@ -346,7 +345,6 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
             
             java.sql.PreparedStatement pst = conn.prepareStatement(sql);
             
-            // The "%" allows finding the text anywhere in the column
             String queryTerm = "%" + searchTxt + "%"; 
             pst.setString(1, queryTerm);
             pst.setString(2, queryTerm);
@@ -354,11 +352,9 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
             
             java.sql.ResultSet rs = pst.executeQuery();
             
-            // 3. Clear existing table rows before adding new search results
             javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTablemain.getModel();
             model.setRowCount(0); 
             
-            // 4. Loop through results and populate the table
             while (rs.next()) {
                 Object[] row = {
                     rs.getString("BookID"),
@@ -371,12 +367,11 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
                 model.addRow(row);
             }
             
-            // 5. Provide feedback if no results were found
             if (model.getRowCount() == 0) {
                 javax.swing.JOptionPane.showMessageDialog(this, "No books found matching your search.");
             }
             
-            conn.close(); // Important: Close connection to free resources
+            conn.close(); 
         }
     } catch (Exception e) {
         javax.swing.JOptionPane.showMessageDialog(this, "Search Error: " + e.getMessage());
@@ -401,7 +396,6 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
     }
     
     try {
-        // Get book data from selected row
         String bookId = jTablemain.getValueAt(selectedRow, 0).toString();
         String bookName = jTablemain.getValueAt(selectedRow, 1).toString();
         String author = jTablemain.getValueAt(selectedRow, 2).toString();
@@ -409,7 +403,6 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
         double price = Double.parseDouble(jTablemain.getValueAt(selectedRow, 4).toString());
         int stock = Integer.parseInt(jTablemain.getValueAt(selectedRow, 5).toString());
         
-        // Check stock availability
         if (stock <= 0) {
             javax.swing.JOptionPane.showMessageDialog(this, 
                 "Sorry, this book is currently Out of Stock!", 
@@ -418,10 +411,8 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
             return;
         }
         
-        // Create cart item with default quantity 1
         Object[] cartItem = {bookId, bookName, author, date, price, 1, price * 1}; // ID, Name, Author, Date, Price, Qty, Total
         
-        // Add to BOTH local and static cart (for persistence)
         localCart.add(cartItem);
         cartList.add(cartItem);
         
@@ -434,7 +425,6 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
 
 
 
-        // TODO add your handling code here:
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -445,7 +435,6 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
     if (localCart.isEmpty() && cartList.isEmpty()) {
         javax.swing.JOptionPane.showMessageDialog(this, "Your cart is empty!");
     } else {
-        // Use the static cartList to ensure data persistence
         shoppingCart cartUI = new shoppingCart(cartList); 
         cartUI.setVisible(true);
         this.dispose();
@@ -455,22 +444,18 @@ private static java.util.ArrayList<Object[]> cartList = new java.util.ArrayList<
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-// 1. Display a confirmation dialog to the user
 int confirm = javax.swing.JOptionPane.showConfirmDialog(this, 
     "Are you sure you want to logout?", 
     "Logout Confirmation", 
     javax.swing.JOptionPane.YES_NO_OPTION);
 
 if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-    // 2. Open the Login frame
     login loginFrame = new login();
     loginFrame.setVisible(true);
     
-    // 3. Close the current frame (Main Page)
     this.dispose();
     
-    // Optional: If you have a User Session class, clear it here
-    // UserSession.clear(); 
+   
 }    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**

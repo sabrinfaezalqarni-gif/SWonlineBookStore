@@ -11,18 +11,16 @@ public class adminDashboard extends javax.swing.JFrame {
     
    public adminDashboard() {
     initComponents();
-    // استدعاء الدوال هنا ضروري لكي تظهر البيانات فور فتح الصفحة
     loadBooksData();   
     loadOrdersData();  
     
-    // إضافة "مستمع" للجدول: عندما يضغط الآدمن على سطر، تمتلئ الحقول تلقائياً للتعديل
     jTableBooks.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseClicked(java.awt.event.MouseEvent evt) {
             int row = jTableBooks.getSelectedRow();
             txttitle.setText(jTableBooks.getValueAt(row, 1).toString());
             txtauthor.setText(jTableBooks.getValueAt(row, 2).toString());
-            txtprice.setText(jTableBooks.getValueAt(row, 5).toString()); // السعر في العمود الأخير
-            txtstock.setText(jTableBooks.getValueAt(row, 4).toString()); // المخزون في العمود قبل الأخير
+            txtprice.setText(jTableBooks.getValueAt(row, 5).toString()); 
+            txtstock.setText(jTableBooks.getValueAt(row, 4).toString()); 
         }
     });
 }
@@ -54,26 +52,23 @@ public class adminDashboard extends javax.swing.JFrame {
   private void loadOrdersData() {
     try {
         java.sql.Connection conn = DatabaseConnection.connect();
-        // لاحظي استخدام اسم الجدول الجديد 'orders' بدلاً من 'user'
         String sql = "SELECT order_id, total_price, status, order_date FROM orders";
         java.sql.PreparedStatement pst = conn.prepareStatement(sql);
         java.sql.ResultSet rs = pst.executeQuery();
         
-        // تأكدي أن اسم الجدول في الواجهة هو jTableOrders
         orderModel = (DefaultTableModel) jTableOrders.getModel();
         orderModel.setRowCount(0);
         
         while (rs.next()) {
             orderModel.addRow(new Object[]{
-                rs.getInt("order_id"),      // أصبح رقم (int)
-                rs.getDouble("total_price"), // أصبح رقم (double)
+                rs.getInt("order_id"),     
+                rs.getDouble("total_price"), 
                 rs.getString("status"),
                 rs.getTimestamp("order_date")
             });
         }
         conn.close();
     } catch (Exception e) {
-        // نصيحة هندسية: استخدمي JOptionPane لإظهار الخطأ بوضوح أثناء البرمجة
         javax.swing.JOptionPane.showMessageDialog(this, "Error loading orders: " + e.getMessage());
     }
 }
@@ -442,18 +437,16 @@ public class adminDashboard extends javax.swing.JFrame {
         pst.executeUpdate();
         javax.swing.JOptionPane.showMessageDialog(this, "Book Updated Successfully!");
         
-        loadBooksData(); // تحديث الجدول
+        loadBooksData(); 
         conn.close();
     } catch (Exception e) {
         javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
     }
-        // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
     try {
         java.sql.Connection conn = DatabaseConnection.connect();
-        // التعديل هنا: إضافة تعريف PreparedStatement
         String sql = "INSERT INTO book (BookName, Author, Price, Stock) VALUES (?, ?, ?, ?)";
         java.sql.PreparedStatement pst = conn.prepareStatement(sql); 
         
@@ -465,7 +458,6 @@ public class adminDashboard extends javax.swing.JFrame {
         pst.executeUpdate();
         javax.swing.JOptionPane.showMessageDialog(this, "Book Added Successfully!");
         
-        // تنظيف الحقول وتحديث الجدول
         txttitle.setText(""); txtauthor.setText(""); txtprice.setText(""); txtstock.setText("");
         loadBooksData(); 
         conn.close();
@@ -484,7 +476,6 @@ public class adminDashboard extends javax.swing.JFrame {
         return;
     }
 
-    // الحصول على ID الكتاب من السطر المختار (العمود رقم 0)
     String bookID = jTableBooks.getValueAt(selectedRow, 0).toString();
     
     int confirm = javax.swing.JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this book?", "Confirm Delete", javax.swing.JOptionPane.YES_NO_OPTION);
@@ -499,7 +490,7 @@ public class adminDashboard extends javax.swing.JFrame {
             pst.executeUpdate();
             javax.swing.JOptionPane.showMessageDialog(this, "Book Deleted Successfully!");
             
-            loadBooksData(); // إعادة تحميل الجدول بعد الحذف
+            loadBooksData(); 
             conn.close();
         } catch (Exception e) {
             javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());

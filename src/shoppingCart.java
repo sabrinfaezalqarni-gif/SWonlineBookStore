@@ -11,27 +11,21 @@ import java.util.ArrayList;
 public class shoppingCart extends javax.swing.JFrame {
 
     private java.util.ArrayList<Object[]> localCart;
- // أضيفي هذا السطر في أعلى الكلاس تحت سطر اسم الكلاس مباشرة
 DefaultTableModel orderModel;
 
 private void calculateGrandTotal() {
     double sum = 0;
-    // Iterate through all rows in the table
     for (int i = 0; i < jTableCart.getRowCount(); i++) {
-        // Get value from column 6 (The "Total" column)
         Object value = jTableCart.getValueAt(i, 6);
         if (value != null) {
             sum += Double.parseDouble(value.toString());
         }
     }
-    // Update your label with the calculated sum
-    // Assuming your label name is lblGrandTotal
     lblGrandTotal.setText("Total : " + sum + " SAR");
 } 
 public shoppingCart(java.util.ArrayList<Object[]> passedCart) {
-    initComponents(); // هذا يستدعي التصميم الأصلي
+    initComponents();
     
-    // نضع الكود هنا لإعادة تعريف موديل الجدول بالأعمدة الجديدة
     jTableCart.setModel(new javax.swing.table.DefaultTableModel(
         new Object [][] {},
         new String [] {
@@ -56,10 +50,9 @@ public shoppingCart(java.util.ArrayList<Object[]> passedCart) {
  private void addToCartDatabase(int bookId, int quantity) {
     try {
         java.sql.Connection conn = DatabaseConnection.connect();
-        // الحفظ في جدول cart الجديد الذي أنشأناه
         String sql = "INSERT INTO cart (user_id, book_id, quantity) VALUES (?, ?, ?)";
         java.sql.PreparedStatement pst = conn.prepareStatement(sql);
-        pst.setInt(1, CurrentUser.id); // الـ id الذي أضفناه لجدول user
+        pst.setInt(1, CurrentUser.id); 
         pst.setInt(2, bookId);
         pst.setInt(3, quantity);
         pst.executeUpdate();
@@ -68,8 +61,6 @@ public shoppingCart(java.util.ArrayList<Object[]> passedCart) {
         e.printStackTrace();
     }
 } 
-  // Method to display items from the ArrayList into the JTable
-
     private void displayCartItems() {
 
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTableCart.getModel();
@@ -85,7 +76,6 @@ public shoppingCart(java.util.ArrayList<Object[]> passedCart) {
     }
 private void updateRowTotal(int row) {
     try {
-        // CORRECT: Price col 4, Quantity col 5, Total col 6 (index 5)
         double price = Double.parseDouble(jTableCart.getValueAt(row, 4).toString());
         int qty = Integer.parseInt(jTableCart.getValueAt(row, 5).toString());
         
@@ -95,24 +85,21 @@ private void updateRowTotal(int row) {
         }
 
         double rowTotal = price * qty;
-        jTableCart.setValueAt(rowTotal, row, 6); // Total column (index 6)
+        jTableCart.setValueAt(rowTotal, row, 6); 
         calculateTotal(); 
     } catch (NumberFormatException e) {
         jTableCart.setValueAt(1, row, 5);
         calculateTotal();
     }
 }
-// [Goal 3] Calculate Grand Total Price
 private void calculateTotal() {
     double grandTotal = 0;
     for (int i = 0; i < jTableCart.getRowCount(); i++) {
         try {
-            // CORRECT INDICES: Price at col 4 (index 4), Qty at col 5 (index 5)
             double price = Double.parseDouble(jTableCart.getValueAt(i, 4).toString());
             int qty = Integer.parseInt(jTableCart.getValueAt(i, 5).toString());
             grandTotal += (price * qty);
         } catch (NumberFormatException e) {
-            // Skip rows with invalid data
             continue;
         }
     }
@@ -350,14 +337,11 @@ private void calculateTotal() {
     int selectedRow = jTableCart.getSelectedRow();
     
     if (selectedRow != -1) {
-        // 1. Remove from the underlying ArrayList (Encapsulation)
         localCart.remove(selectedRow);
         
-        // 2. Update the table display
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTableCart.getModel();
         model.removeRow(selectedRow);
         
-        // 3. Recalculate the grand total
         calculateTotal();
         
         javax.swing.JOptionPane.showMessageDialog(this, "Item removed from cart.");
@@ -379,7 +363,6 @@ private void calculateTotal() {
         JOptionPane.showMessageDialog(this, "Your cart is empty!");
         return;
     }
-    // الانتقال لصفحة الدفع وتمرير محتويات السلة لها
     new checkout(localCart).setVisible(true);
     this.dispose();
 
@@ -399,11 +382,9 @@ this.dispose();
      * @param args the command line arguments
      */
    public static void main(String args[]) {
-    // ... (كود الـ Look and Feel يظل كما هو)
     
     java.awt.EventQueue.invokeLater(new Runnable() {
         public void run() {
-            // أضيفي قائمة فارغة هنا لإصلاح خطأ الـ Build
             new shoppingCart(new java.util.ArrayList<Object[]>()).setVisible(true);
         }
     });

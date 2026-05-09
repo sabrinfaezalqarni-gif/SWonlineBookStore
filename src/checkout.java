@@ -15,15 +15,12 @@ public checkout(java.util.ArrayList<Object[]> passedCart) {
     initComponents();
     this.localCart = passedCart;
     
-    // Calculate total amount immediately
     double total = 0;
     if (localCart != null) {
         for (Object[] item : localCart) {
-            // Index 6 is the "Total" column from the shopping cart table
             total += Double.parseDouble(item[6].toString());
         }
     }
-    // Display the sum in the label
     lblTotal.setText("Total: SAR " + total);
 }
     /**
@@ -276,14 +273,11 @@ public checkout(java.util.ArrayList<Object[]> passedCart) {
     try {
         java.sql.Connection conn = DatabaseConnection.connect();
         
-        // 1. حساب الإجمالي
         double total = 0;
         for (Object[] item : localCart) {
             total += Double.parseDouble(item[6].toString());
         }
 
-        // 2. حفظ الطلب في جدول orders لكي يراه الآدمن
-        // ملاحظة: العمود اسمه 'id' في جدولك للربط بالمستخدم، و 'total_price' للمبلغ
         String sqlOrder = "INSERT INTO orders (id, total_price, status) VALUES (?, ?, 'Pending')";
         java.sql.PreparedStatement pstOrder = conn.prepareStatement(sqlOrder);
         pstOrder.setInt(1, CurrentUser.id);
@@ -295,7 +289,6 @@ if (CurrentUser.id <= 0) {
 }
         pstOrder.executeUpdate();
 
-        // 3. عرض الفاتورة للمستخدم
         StringBuilder bill = new StringBuilder();
         bill.append("---------- IQRA BOOKSTORE ----------\n");
         bill.append("Customer: " + CurrentUser.name + "\n");

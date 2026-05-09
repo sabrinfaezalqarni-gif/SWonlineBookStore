@@ -251,7 +251,6 @@ this.dispose();        // TODO add your handling code here:
     try {
         java.sql.Connection conn = DatabaseConnection.connect();
         
-        // 1. فحص هل المستخدم موجود في جدول الـ Admins؟
         String adminSql = "SELECT * FROM admins WHERE username = ? AND password = ?";
         java.sql.PreparedStatement adminPst = conn.prepareStatement(adminSql);
         adminPst.setString(1, user);
@@ -259,9 +258,8 @@ this.dispose();        // TODO add your handling code here:
         java.sql.ResultSet adminRs = adminPst.executeQuery();
 
         if (adminRs.next()) {
-            // إذا وجده في جدول الآدمن
             JOptionPane.showMessageDialog(this, "Welcome Admin: " + adminRs.getString("full_name"));
-            new adminDashboard().setVisible(true); // فتح لوحة تحكم الآدمن
+            new adminDashboard().setVisible(true); 
             this.dispose();
         } else {
             String userSql = "SELECT * FROM user WHERE username = ? AND password = ?";
@@ -271,7 +269,6 @@ this.dispose();        // TODO add your handling code here:
             java.sql.ResultSet userRs = userPst.executeQuery();
 
       if (userRs.next()) {
-    // جلب الرقم من عمود id وتخزينه في الكلاس المشترك
     CurrentUser.id = userRs.getInt("id"); 
     CurrentUser.name = userRs.getString("FullName");
 
