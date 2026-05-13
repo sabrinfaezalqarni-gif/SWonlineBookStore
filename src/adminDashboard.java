@@ -101,7 +101,6 @@ public class adminDashboard extends javax.swing.JFrame {
         txtprice = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         txtstock = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         txtauthor = new javax.swing.JTextField();
@@ -231,16 +230,6 @@ public class adminDashboard extends javax.swing.JFrame {
 
         txtstock.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(188, 143, 95)));
 
-        jButton1.setBackground(new java.awt.Color(101, 67, 30));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(245, 234, 216));
-        jButton1.setText("Add Book");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
         jButton2.setBackground(new java.awt.Color(139, 90, 43));
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 11)); // NOI18N
         jButton2.setForeground(new java.awt.Color(245, 234, 216));
@@ -293,10 +282,8 @@ public class adminDashboard extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(txtauthor, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(27, 27, 27)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton1)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(96, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel10)
@@ -321,8 +308,7 @@ public class adminDashboard extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txttitle, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtauthor, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
+                    .addComponent(jButton2))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(6, 6, 6)
@@ -462,30 +448,6 @@ public class adminDashboard extends javax.swing.JFrame {
     }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    try {
-        java.sql.Connection conn = DatabaseConnection.connect();
-        String sql = "INSERT INTO book (BookName, Author, Price, Stock) VALUES (?, ?, ?, ?)";
-        java.sql.PreparedStatement pst = conn.prepareStatement(sql); 
-        
-        pst.setString(1, txttitle.getText());
-        pst.setString(2, txtauthor.getText());
-        pst.setDouble(3, Double.parseDouble(txtprice.getText()));
-        pst.setInt(4, Integer.parseInt(txtstock.getText()));
-        
-        pst.executeUpdate();
-        javax.swing.JOptionPane.showMessageDialog(this, "Book Added Successfully!");
-        
-        txttitle.setText(""); txtauthor.setText(""); txtprice.setText(""); txtstock.setText("");
-        loadBooksData(); 
-        conn.close();
-    } catch (Exception e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-    }
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
     int selectedRow = jTableBooks.getSelectedRow();
     
@@ -567,7 +529,6 @@ public class adminDashboard extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
